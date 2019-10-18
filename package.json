@@ -5,7 +5,7 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node ./src/server.js",
-    "dev": "nodemon -w ./assets/js -w ./test/ui -x 'npm run test:ui' & nodemon -w ./src -w ./public -w ./node_modules/lev-react-components/dist/index.js ./src/server.js",
+    "dev": "nodemon -w ./assets/js -w ./test/ui -x 'npm run test:ui' & MOCK=true nodemon -w ./src -w ./public -w ./node_modules/lev-react-components/dist/index.js ./src/server.js",
     "test": "npm run test:ui && npm run test:server",
     "test:server": "eslint src && mocha test/server",
     "test:ui": "eslint assets/js && mocha test/ui",
@@ -27,6 +27,7 @@
   "dependencies": {
     "bluebird": "^3.5.4",
     "browserify": "^16.2.3",
+    "bunyan": "^1.8.12",
     "lev-react-components": "^0.4.2",
     "lev-react-renderer": "^0.1.0",
     "lev-restify": "^1.0.0",
