@@ -1,3 +1,3 @@
-module.exports = {
-  searches: Math.floor(Math.random() * 1000)
-}
+module.exports = [{
+  count: Math.floor(Math.random() * 100)
+}]
