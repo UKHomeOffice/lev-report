@@ -8,6 +8,7 @@ module.exports = {
   usageByDateType: () => Promise.resolve(daily),
   usageByType: () => Promise.resolve(totals),
   usageByGroup: () => Promise.resolve(groups),
-  allTimeSearches: () => Promise.resolve(allTime),
-  dailySearches: () => Promise.resolve(dailySearches)
+  searchTotals: () => Promise.resolve(allTime),
+  // eslint-disable-next-line no-dupe-keys
+  searchTotals: () => Promise.resolve(dailySearches)
 };

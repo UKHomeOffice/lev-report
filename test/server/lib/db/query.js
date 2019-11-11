@@ -25,48 +25,11 @@ describe('lib/db/query', () => {
         );
     });
 
-    describe('dailySearches function', () => {
-        // eslint-disable-next-line no-underscore-dangle
-        const dailyCountSQL = query.__get__('dailyCount');
-        let fakeQuery;
-        let stub;
-        before(() => {
-            stub = sinon.stub();
-            stub.returns(Promise.resolve());
-            fakeQuery = proxyquire('../../../../src/lib/db/query', {
-                './postgres': { manyOrNone: stub }
-            });
-        });
-        describe('when no empty group object exists', () => {
-            it('should return a promise', () =>
-                expect(fakeQuery.dailySearches())
-                    .to.be.an.instanceOf(Promise)
-                    .that.is.fulfilled
-            );
-            it('should pass SQL to the database library with an empty param object', () =>
-                expect(stub).to.have.been.calledOnce
-                    .and.to.have.been.calledWith(dailyCountSQL, {})
-            );
-        });
-        describe('when a group object exists', () => {
-            before(() => {
-                stub.resetHistory();
-            });
-            it('should return a promise', () =>
-                expect(fakeQuery.dailySearches('group'))
-                    .to.be.an.instanceOf(Promise)
-                    .that.is.fulfilled
-            );
-            it('should pass SQL to the database library with a param object', () =>
-                expect(stub).to.have.been.calledOnce
-                // eslint-disable-next-line no-underscore-dangle,max-len
-                    .and.to.have.been.calledWith(dailyCountSQL + query.__get__('groupFilter'), { group: '%group%' })
-            );
-         });
-    });
-    describe('totalSearches function', () => {
+    describe('searchTotals function', () => {
         // eslint-disable-next-line no-underscore-dangle
         const totalCountSQL = query.__get__('totalCount');
+        // eslint-disable-next-line no-underscore-dangle
+        const forTodaySQL = query.__get__('forToday');
         let fakeQuery;
         let stub;
         before(() => {
@@ -76,9 +39,9 @@ describe('lib/db/query', () => {
                 './postgres': { manyOrNone: stub }
             });
         });
-        describe('when no empty group object exists', () => {
+        describe('when no empty group object exists and query for total searches', () => {
             it('should return a promise', () =>
-                expect(fakeQuery.allTimeSearches())
+                expect(fakeQuery.searchTotals('', true))
                     .to.be.an.instanceOf(Promise)
                     .that.is.fulfilled
             );
@@ -92,15 +55,16 @@ describe('lib/db/query', () => {
                 stub.resetHistory();
             });
             it('should return a promise', () =>
-                expect(fakeQuery.allTimeSearches('group'))
+                expect(fakeQuery.searchTotals('group', false))
                     .to.be.an.instanceOf(Promise)
                     .that.is.fulfilled
             );
             it('should pass SQL to the database library with a param object', () =>
                 expect(stub).to.have.been.calledOnce
-                // eslint-disable-next-line no-underscore-dangle,max-len
-                    .and.to.have.been.calledWith(totalCountSQL + query.__get__('noDateGroupFilter'), { group: '%group%' })
+                    .and.to.have.been.calledWith(totalCountSQL + forTodaySQL + ' AND ' +
+                    // eslint-disable-next-line no-underscore-dangle
+                    query.__get__('groupFilter'), { group: '%group%' })
             );
-        });
+         });
     });
 });

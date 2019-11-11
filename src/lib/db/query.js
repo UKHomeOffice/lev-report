@@ -8,14 +8,13 @@ const countsByType = 'SELECT dataset, count(*)::INTEGER FROM lev_audit WHERE dat
 const countsByUser =
   'SELECT date_time::DATE AS date, dataset, username, count(*)::INTEGER FROM lev_audit WHERE date_time > $(from)';
 const until = 'AND date_time < $(to)';
-const groupFilter = ' AND groups::TEXT ILIKE $(group)';
-const noDateGroupFilter = ' WHERE groups::TEXT ILIKE $(group)';
 const groupByDateType = ' GROUP BY date_time::date, dataset ORDER BY date_time::date';
 const groupByType = ' GROUP BY dataset';
 const groupByDateTypeUser = ' GROUP BY date_time::date, dataset, username ORDER BY date_time::date';
 const groupByTypeGroup = 'GROUP BY name, dataset';
 const totalCount = 'SELECT count(*) FROM lev_audit';
-const dailyCount = 'SELECT count(*) FROM lev_audit WHERE date_time::DATE = current_date';
+const forToday = ' WHERE date_time::DATE = current_date';
+const groupFilter = 'groups::TEXT ILIKE $(group)';
 
 const buildCountsByGroup = (from, to, includeNoGroup = true) => `
 SELECT name, dataset, SUM(count)::INTEGER AS count
@@ -67,21 +66,14 @@ module.exports = {
       throw new Error('Could not fetch data');
     }),
 
-  allTimeSearches: (group) => db.manyOrNone(
-    `${group ? totalCount + noDateGroupFilter : totalCount}`,
-    filterObject({ group: group && `%${group}%` }))
-    .catch(e => {
-      global.logger.error(
-          `Problem retrieving a count for total all time searches ${group ? 'for group ' + group : ''}`, e);
-      throw new Error('Could not fetch data');
-    }),
-
-  dailySearches: (group) => db.manyOrNone(
-  `${group ? dailyCount + groupFilter : dailyCount}`,
-    filterObject({ group: group && `%${group}%` }))
-  .catch(e => {
-    global.logger.error(
-        `Problem retrieving a count for searches today ${group ? 'from group ' + group : 'with no group selected'}`, e);
-    throw new Error('Could not fetch data');
-  })
+    searchTotals: (group, isAllTimeCount) => db.manyOrNone(
+        `${isAllTimeCount ? totalCount : totalCount + forToday}` +
+        `${isAllTimeCount && group ? ' WHERE ' + groupFilter : ''}` +
+        `${!isAllTimeCount && group ? ' AND ' + groupFilter : ''}`,
+        filterObject({ group: group && `%${group}%` }))
+        .catch(e => {
+            global.logger.error(`Problem retrieving ${isAllTimeCount ? 'an all time count' : 'a count for today'}` +
+            `${group ? ' of group ' + group : ' with no group selected'}`, e);
+        throw new Error('Could not fetch data');
+    })
 };
