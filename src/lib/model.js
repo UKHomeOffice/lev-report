@@ -60,7 +60,8 @@ const build = (dateFrom, dateTo, currentGroup, groupName) => Promise.join(
   groupUsage(dateFrom, dateTo),
   query.searchTotals(currentGroup, true),
   query.searchTotals(currentGroup, false),
-  (daily, totals, groups, allTime, todaySearches) => ({
+  query.searchTimePeriodByGroup(currentGroup, dateFrom, dateTo),
+  (daily, totals, groups, allTime, todaySearches, totalTimePeriodByGroup) => ({
     from: dateFrom,
     to: dateTo,
     dates: datesInRange(dateFrom, dateTo || moment().endOf('day')),
@@ -70,6 +71,7 @@ const build = (dateFrom, dateTo, currentGroup, groupName) => Promise.join(
     currentGroup: groupName,
     allTime,
     todaySearches,
+    totalTimePeriodByGroup,
   })
 );
 

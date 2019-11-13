@@ -10,5 +10,6 @@ module.exports = {
   usageByGroup: () => Promise.resolve(groups),
   searchTotals: () => Promise.resolve(allTime),
   // eslint-disable-next-line no-dupe-keys
-  searchTotals: () => Promise.resolve(dailySearches)
+  searchTotals: () => Promise.resolve(dailySearches),
+  searchTimePeriodByGroup: () => Promise.resolve(dailySearches)
 };

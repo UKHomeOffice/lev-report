@@ -35,7 +35,7 @@ module.exports = server => {
 
   server.get('/*', (req, res) => {
     let fromDate = req.query && req.query.from && moment(req.query.from, dateFormat) || moment().startOf('month');
-    fromDate = (fromDate.isValid() ? fromDate : moment()).format(dateFormat);
+   // fromDate = (fromDate.isValid() ? fromDate : moment()).format(dateFormat);
     const toDate = req.query && req.query.to && moment(req.query.to, dateFormat);
     const currentGroup = req.query.currentGroup !== 'No group' ? req.query.currentGroup : '{}';
 

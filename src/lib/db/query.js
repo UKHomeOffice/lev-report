@@ -15,6 +15,7 @@ const groupByTypeGroup = 'GROUP BY name, dataset';
 const totalCount = 'SELECT count(*) FROM lev_audit';
 const forToday = ' WHERE date_time::DATE = current_date';
 const groupFilter = 'groups::TEXT ILIKE $(group)';
+const fromDate = 'WHERE date_time > $(from)';
 
 const buildCountsByGroup = (from, to, includeNoGroup = true) => `
 SELECT name, dataset, SUM(count)::INTEGER AS count
@@ -75,5 +76,13 @@ module.exports = {
             global.logger.error(`Problem retrieving ${isAllTimeCount ? 'an all time count' : 'a count for today'}` +
             `${group ? ' of group ' + group : ' with no group selected'}`, e);
         throw new Error('Could not fetch data');
+    }),
+
+    searchTimePeriodByGroup: (group, from, to) => db.manyOrNone(
+    `${totalCount} ${fromDate} ${to ? until : ''} ${group ? 'AND ' + groupFilter : ''}`,
+    filterObject({ from: from, to: to, group: group && `%${group}%` }))
+        .catch(e => {
+            global.logger.error('test', e);
+            throw new Error('Could not fetch data');
     })
 };
