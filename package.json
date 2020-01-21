@@ -1,6 +1,6 @@
 {
   "name": "lev-report",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "Reports showing usage of LEV.",
   "main": "src/server.js",
   "scripts": {
@@ -29,7 +29,7 @@
     "bluebird": "^3.5.4",
     "browserify": "^16.2.3",
     "lev-react-components": "^0.5.3",
-    "lev-react-renderer": "^0.1.0",
+    "lev-react-renderer": "^1.1.0",
     "lev-restify": "^1.0.0",
     "moment": "^2.24.0",
     "pg-monitor": "^1.1.0",
