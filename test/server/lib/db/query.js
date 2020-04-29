@@ -9,7 +9,7 @@ const stubs = {
 	one: sinon.stub().resolves(),
 	manyOrNone: sinon.stub().resolves()
 };
-const fakeQuery = proxyquire('../../../../src/lib/db/query', {
+let fakeQuery = proxyquire('../../../../src/lib/db/query', {
 	'./postgres': stubs
 });
 
@@ -262,29 +262,84 @@ describe('lib/db/query', () => {
 			after('restore current time', () => timeshift());
 		});
 	});
-
-	describe('searchTimePeriodByGroup function', () => {
+	describe('searchWithGroupFiltering function', () => {
 		const from = '2000-01-30';
 		const to = '2000-02-02';
 		const group = 'HMRC';
-		before(() => {
-			stubs.one.resetHistory();
-			fakeQuery.searchTimePeriodByGroup(from, to, group);
-		});
-		it('should build an sql statement when `to, from and group` are provided', () =>
-			expect(stubs.one).to.have.been.calledOnce
-				.and.to.have.been.calledWith(fixtures.searchTimePeriodByGroup.fromToGroupSQL, { from, to, group })
+		const withoutGroups = ['HMPO', 'DWP'];
+
+		it('should return a promise', () =>
+			expect(fakeQuery.searchWithGroupFiltering())
+				.to.be.an.instanceOf(Promise)
+				.that.is.fulfilled
 		);
 		describe('when function is called with empty dates', () => {
-			before(() => {
+			it('should build an sql statement when only group is provided', () => {
 				stubs.one.resetHistory();
-				fakeQuery.searchTimePeriodByGroup('', '', group);
-			});
-			it('should build an sql statement when to and from dates are not provided', () =>
+				fakeQuery.searchWithGroupFiltering(from, '', group);
 				expect(stubs.one).to.have.been.calledOnce
-					.and.to.have.been.calledWith(fixtures.searchTimePeriodByGroup.gorupOnlySQL, { group })
-			);
+					.and.to.have.been.calledWith(fixtures.searchWithGroupFiltering.groupOnlySQL, { from, group });
+			});
+		it('should build an sql statement when only multiple withoutGroups is provided', () => {
+			stubs.one.resetHistory();
+			fakeQuery.searchWithGroupFiltering(from, '', '', withoutGroups);
+				expect(stubs.one).to.have.been.calledOnce
+					.and.to.have.been.calledWith(fixtures.searchWithGroupFiltering.multipleWithoutGroupsOnly,
+					{ from, withoutGroups });
 		});
+		it('should build an sql statement when only single withoutGroups is provided', () => {
+			stubs.one.resetHistory();
+			fakeQuery.searchWithGroupFiltering(from, '', '', group);
+				expect(stubs.one).to.have.been.calledOnce
+					.and.to.have.been.calledWith(fixtures.searchWithGroupFiltering.singleWithoutGroupsOnly,
+					{ from, withoutGroups: group });
+		});
+	});
+		describe('when function is called with arguments', () => {
+			it('should build an sql statement when `to, from and group` are provided', () => {
+				stubs.one.resetHistory();
+				fakeQuery.searchWithGroupFiltering(from, to, group);
+				expect(stubs.one).to.have.been.calledOnce
+					.and.to.have.been.calledWith(fixtures.searchWithGroupFiltering.fromToGroupSQL, { from, to, group });
+			});
+			it('should build an sql statement when `to, from, group and withoutGroups` are provided', () => {
+				stubs.one.resetHistory();
+				fakeQuery.searchWithGroupFiltering(from, to, group, withoutGroups);
+				expect(stubs.one).to.have.been.calledOnce
+					.and.to.have.been.calledWith(fixtures.searchWithGroupFiltering.fromToGroupMultipleWithoutGroupsSQL,
+					{ from, to, group, withoutGroups });
+			});
+		});
+			describe('when function is called with date arguments and withoutGroups is a String', () => {
+				it('should build an sql statement when `to, from and withoutGroup` are provided', () => {
+					stubs.one.resetHistory();
+					fakeQuery.searchWithGroupFiltering(from, to, '', group);
+					expect(stubs.one).to.have.been.calledWith(fixtures.searchWithGroupFiltering.fromToSingleWithoutGroupsSQL,
+						{ from, to, withoutGroups: group });
+				});
+			});
+	});
+	describe('totalCustomerSearches function', () => {
+		let stub;
+		before(() => {
+			stub = sinon.stub();
+			stub.returns(Promise.resolve());
+			fakeQuery = proxyquire('../../../../src/lib/db/query', {
+				'./postgres': { one: stub }
+			});
+		});
+		it('should return a promise', () =>
+			expect(fakeQuery.totalCustomerSearches())
+				.to.be.an.instanceOf(Promise)
+				.that.is.fulfilled
+		);
+		it('should build an SQL statement', () =>
+			expect(stub).to.have.been.calledOnce
+				.and.to.have.been.calledWith('SELECT count(*) FROM lev_audit ' +
+				'WHERE groups <> \'{}\'::TEXT[] ' +
+				'AND NOT (groups && \'{/Monitoring,/Monitoring/Pingdom,"/Monitoring/Smoke tests",' +
+				'/LEV,/LEV/Delivery,/LEV/DSST,"/Team Delivery"}\')')
+		);
 	});
 
 	describe('hourlyUsage', () => {

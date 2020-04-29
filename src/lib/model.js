@@ -24,10 +24,10 @@ const insertData = (model, data) => data.forEach(
 );
 
 const datatypes = ['birth', 'death', 'marriage', 'partnership'];
-const dailyUsage = (dateFrom, dateTo, searchGroup) => {
+const dailyUsage = (dateFrom, dateTo, searchGroup, searchWithoutGroups) => {
   const usage = datatypes.reduce((u, dt) => objPush(u, dt, []), { });
 
-  return query.usageByDateType(dateFrom, dateTo, searchGroup).then(data => {
+  return query.usageByDateType(dateFrom, dateTo, searchGroup, searchWithoutGroups).then(data => {
     insertData(usage, data);
     return Object.entries(usage).reduce((u, e) => [...u, { name: e[0], dailyUsage: e[1] }], []);
   });
@@ -55,6 +55,8 @@ const processGroups = data => data.reduce(
   , []);
 const groupUsage = (dateFrom, dateTo) => query.usageByGroup(dateFrom, dateTo).then(processGroups);
 
+const build = (dateFrom, dateTo, searchGroup, groupSearchText, searchWithoutGroups) => Promise.join(
+  dailyUsage(dateFrom, dateTo, searchGroup, searchWithoutGroups),
 const hours = (name, colour) => ({
   name,
   data: Array.from({ length: 24 }, (_, n) => ({ count: 0, hour: n })),
@@ -93,9 +95,8 @@ const build = (dateFrom, dateTo, searchGroup, groupSearchText) => Promise.join(
   dailyUsage(dateFrom, dateTo, searchGroup),
   datasetUsage(dateFrom, dateTo),
   groupUsage(dateFrom, dateTo),
-  query.searchTimePeriodByGroup(dateFrom, dateTo, searchGroup),
-  hourlyUsage(dateFrom, dateTo, searchGroup),
-  (daily, totals, groups, total, hourly) => ({
+  query.searchWithGroupFiltering(dateFrom, dateTo, searchGroup, searchWithoutGroups),
+  (daily, totals, groups, total) => ({
     from: dateFrom,
     to: dateTo,
     dates: datesInRange(dateFrom, dateTo || moment().endOf('day')),
@@ -103,6 +104,8 @@ const build = (dateFrom, dateTo, searchGroup, groupSearchText) => Promise.join(
     groups,
     totals,
     currentGroup: groupSearchText,
+    total,
+    withoutGroups: searchWithoutGroups
     total,
     hourlyUsage: hourly
   })

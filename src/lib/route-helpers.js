@@ -29,7 +29,8 @@ const home = (query, ErrorReporter) => new Promise((resolve) => {
     (fromDate ? fromDate : moment.tz('Europe/London').startOf('month').format()),
     toDate,
     searchGroup === 'No group' ? '{}' : searchGroup,
-    searchGroup
+    searchGroup,
+    query && query.withoutGroups
   ));
 });
 
