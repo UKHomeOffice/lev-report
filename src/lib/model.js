@@ -76,14 +76,14 @@ const dayCounts = (from, to) => {
 };
 const processHourlyUsage = (nod, data) => {
   const total = nod[0] + nod[1];
-  const traces = [nod[0] && hours('weekday'), nod[1] && hours('weekend')];
-  const average = hours('average').data;
+  const traces = [nod[0] && hours('weekday', '#2746B9'), nod[1] && hours('weekend', '#31BB76')];
+  const average = hours('average', '#0B69D4');
   data.forEach(d => {
     traces[d.weekend].data[d.hour].count = (d.count / nod[d.weekend]);
-    average[d.hour].count += d.count;
+    average.data[d.hour].count += d.count;
   });
   return [...traces, nod[0] && nod[1] && {
-    name: 'average', data: average.map(o => ({ ...o, count: o.count / total }))
+    ...average, data: average.data.map(o => ({ ...o, count: o.count / total }))
   }].filter(e => e);
 };
 const hourlyUsage = (dateFrom, dateTo, searchGroup) => query.hourlyUsage(dateFrom, dateTo, searchGroup)

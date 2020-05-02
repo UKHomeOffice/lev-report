@@ -91,7 +91,7 @@ describe('lib/model', () => {
 
       it('should return an array of 24 items', () =>
         expect(hours('title'))
-          .to.be.an('object').that.has.keys(['name', 'data'])
+          .to.be.an('object').that.has.keys(['name', 'data', 'colour'])
           .and.property('data').to.be.an('array').that.has.lengthOf(24)
       );
 
