@@ -286,4 +286,48 @@ describe('lib/db/query', () => {
 			);
 		});
 	});
+
+	describe('hourlyUsage', () => {
+		const counts = [
+			{ count: 5, weekend: true, hour: 9 },
+			{ count: 12, weekend: true, hour: 12 },
+			{ count: 15, weekend: true, hour: 13 }
+		];
+		stubs.manyOrNone.returns(Promise.resolve(counts));
+
+		// Calling without a from date is too inefficient, so throw error instead
+		it('should throw an error when called without a "from" date', () =>
+			expect(() => fakeQuery.hourlyUsage()).to.throw('Must be used with "from" date!'));
+		it.skip('should build an SQL statement when no parameters are provided', () =>
+			expect(stubs.manyOrNone).to.have.been.calledOnce
+				.and.to.have.been.calledWith(fixtures.hourlyUsage.noParameterSQL)
+		);
+
+		describe('when called with from date', () => {
+			before(() => stubs.manyOrNone.resetHistory());
+			it('should return an array of hour counts from the DB', () =>
+				expect(fakeQuery.hourlyUsage('today'))
+					.to.be.an.instanceOf(Promise)
+					.that.eventually.deep.equals(counts)
+			);
+			it('should build an SQL statement with `from` date filter', () =>
+				expect(stubs.manyOrNone).to.have.been.calledOnce
+					.and.to.have.been.calledWith(fixtures.hourlyUsage.fromDateOnlySQL, { from: 'today' })
+			);
+
+			describe('and to date, and group', () => {
+				before(() => {
+					stubs.manyOrNone.resetHistory();
+					fakeQuery.hourlyUsage('yesterday', 'today', 'group');
+				});
+				it('should build an SQL statement with `from`/`to` date and `group` filters', () =>
+					expect(stubs.manyOrNone).to.have.been.calledOnce
+						.and.to.have.been.calledWith(
+							fixtures.hourlyUsage.allParametersSQL,
+							{ from: 'yesterday', to: 'today', group: 'group' }
+						)
+				);
+			});
+		});
+	});
 });

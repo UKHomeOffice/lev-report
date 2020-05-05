@@ -104,7 +104,31 @@ module.exports = {
       data => data.count
     )
     .catch(e => {
-      global.logger.error(`Problem retrieving a search from "${from}" to "${to}" for group "${group}"`, e);
+      global.logger.error(`Problem retrieving a search from "${from}" to "${to || 'now'}" for group "${group}"`, e);
       throw new Error('Could not fetch data');
-    })
+    }),
+
+  hourlyUsage: (from, to, group) => {
+    if (!from) {
+      throw Error('Must be used with "from" date!');
+    }
+    return db.manyOrNone(
+      sqlBuilder({
+        'SELECT': 'COUNT(*)::INTEGER, weekend::INTEGER, hour',
+        'FROM': '(',
+        '  SELECT': 'TO_CHAR(date_time AT TIME ZONE \'europe/london\', \'HH24\')::INTEGER AS hour,\n' +
+          '    TO_CHAR(date_time AT TIME ZONE \'europe/london\', \'DAY\') LIKE \'S%\' AS weekend',
+        '  FROM': 'lev_audit',
+        '  WHERE': [fromDate, to && toDate,
+            group ? searchGroup : 'groups::TEXT NOT LIKE \'/Monitor%\' AND client = \'lev-web\''],
+        ')': 'AS counts',
+        'GROUP BY': 'weekend, hour'
+      }, '\n'),
+      filterObject({ from, to, group }))
+      .catch(e => {
+        global.logger.error(
+          `Problem retrieving hour counts between: ${from} and ${to || 'now'} for group "${group}"`, e);
+        throw new Error('Could not fetch data');
+      });
+  }
 };
