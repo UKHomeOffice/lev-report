@@ -54,9 +54,6 @@ const processGroups = data => data.reduce(
       : [...groups, group(d, len && findParent(d, groups))]
   , []);
 const groupUsage = (dateFrom, dateTo) => query.usageByGroup(dateFrom, dateTo).then(processGroups);
-
-const build = (dateFrom, dateTo, searchGroup, groupSearchText, searchWithoutGroups) => Promise.join(
-  dailyUsage(dateFrom, dateTo, searchGroup, searchWithoutGroups),
 const hours = (name, colour) => ({
   name,
   data: Array.from({ length: 24 }, (_, n) => ({ count: 0, hour: n })),
@@ -91,12 +88,13 @@ const processHourlyUsage = (nod, data) => {
 const hourlyUsage = (dateFrom, dateTo, searchGroup) => query.hourlyUsage(dateFrom, dateTo, searchGroup)
   .then(processHourlyUsage.bind(null, dayCounts(dateFrom, dateTo || moment().endOf('day'))));
 
-const build = (dateFrom, dateTo, searchGroup, groupSearchText) => Promise.join(
-  dailyUsage(dateFrom, dateTo, searchGroup),
+const build = (dateFrom, dateTo, searchGroup, groupSearchText, searchWithoutGroups) => Promise.join(
+  dailyUsage(dateFrom, dateTo, searchGroup, searchWithoutGroups),
   datasetUsage(dateFrom, dateTo),
   groupUsage(dateFrom, dateTo),
   query.searchWithGroupFiltering(dateFrom, dateTo, searchGroup, searchWithoutGroups),
-  (daily, totals, groups, total) => ({
+  hourlyUsage(dateFrom, dateTo, searchGroup),
+  (daily, totals, groups, total, hourly) => ({
     from: dateFrom,
     to: dateTo,
     dates: datesInRange(dateFrom, dateTo || moment().endOf('day')),
@@ -105,9 +103,8 @@ const build = (dateFrom, dateTo, searchGroup, groupSearchText) => Promise.join(
     totals,
     currentGroup: groupSearchText,
     total,
+    hourlyUsage: hourly,
     withoutGroups: searchWithoutGroups
-    total,
-    hourlyUsage: hourly
   })
 );
 

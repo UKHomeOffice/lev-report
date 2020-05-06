@@ -24,12 +24,13 @@ module.exports = {
     sqlBuilder({
       'SELECT': 'date_time::DATE AS date, dataset, count(*)::INTEGER',
       'FROM': 'lev_audit',
-      'WHERE': [from && fromDate, to && toDate, group && searchGroup, withoutGroupsCheck(withoutGroups)],
+      'WHERE': [from && fromDate, to && toDate, group && searchGroup,
+        withoutGroups && (Array.isArray(withoutGroups) && searchWithoutGroups || searchWithoutGroup)],
       'GROUP BY': 'date, dataset',
       'ORDER BY': 'date'
     }, '\n'),
-    filterObject({ from: from, to: to, group: group, withoutGroups: withoutGroups }))
-     .catch(e => {
+    filterObject({ from, to, group, withoutGroups }))
+    .catch(e => {
       global.logger.error(`Problem retrieving counts for datatypes by day between: 
       ${from} and ${to || 'now'} 'for' ${group || 'all groups'}`, e);
       throw new Error('Could not fetch data');
@@ -87,20 +88,21 @@ module.exports = {
     }),
 
   searchTotals: (isAllTimeCount) =>
-      db.one(
-        `${isAllTimeCount ? totalCount : `${totalCount} WHERE ${fromDate}`}`,
-        isAllTimeCount ? [] : { from: moment.tz('Europe/London').startOf('day').format() },
-        data => data.count)
+    db.one(
+      `${isAllTimeCount ? totalCount : `${totalCount} WHERE ${fromDate}`}`,
+      isAllTimeCount ? [] : { from: moment.tz('Europe/London').startOf('day').format() },
+      data => data.count)
       .catch(e => {
         global.logger.error(`Problem retrieving ${isAllTimeCount ? 'an all time count' : 'a count for today'}`, e);
         throw new Error('Could not fetch data');
-      }),
+    }),
 
   searchWithGroupFiltering: (from, to, group, withoutGroups) => db.one(
     sqlBuilder({
       'SELECT': 'count(*)::INTEGER',
       'FROM': 'lev_audit',
-      'WHERE': [from && fromDate, to && toDate, group && searchGroup, withoutGroupsCheck(withoutGroups)]
+      'WHERE': [from && fromDate, to && toDate, group && searchGroup,
+        withoutGroups && (Array.isArray(withoutGroups) && searchWithoutGroups || searchWithoutGroup)]
     }, '\n'),
     filterObject({ from, to, group, withoutGroups }),
     data => data.count
