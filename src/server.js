@@ -18,7 +18,8 @@ server.get('/public/*', restify.plugins.serveStaticFiles('./public'));
 
 const reactRenderer = require('lev-react-renderer');
 server.use(reactRenderer);
-require('./lib/routes')(server);
+const routes = require('./lib/routes');
+routes(server);
 
 server.listen(config.http.port, config.http.host, () => {
   global.logger.info('%s listening at %s', server.name, server.url);
