@@ -2,7 +2,7 @@
 
 const timeshift = require('timeshift');
 const stub = sinon.stub().resolves('finished');
-const {dateChecker, promiseResponder, home, homeError} =
+const { dateChecker, promiseResponder, home, homeError } =
   require('proxyquire')('../../../src/lib/route-helpers', {
     './model': stub
   });

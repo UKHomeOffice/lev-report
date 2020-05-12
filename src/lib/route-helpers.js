@@ -23,15 +23,14 @@ const dateError = RequestError => (value, message) => {
 };
 
 const home = (validate = dateChecker) => (query = {}) => new Promise((resolve) => {
-  const fromDate = validate(query.from, 'Must provide "from" date parameter, and optionally a "to" date');
+  const fromDate = validate(query.from, 'Must provide "from" date parameter, and optionally a "to" date') ||
+    moment.tz('Europe/London').startOf('month').format();
+  const toDate = validate(query.to, `Make sure the date format is "${dateFormat}" (time is ignored)`);
   const searchGroup = query.currentGroup;
-  return resolve(model(
-    (fromDate ? fromDate : moment.tz('Europe/London').startOf('month').format()),
-    validate(query.to, `Make sure the date format is "${dateFormat}" (time is ignored)`),
-    searchGroup === 'No group' ? '{}' : searchGroup,
-    searchGroup,
-    query.withoutGroups
-  ));
+  const searchGroupValue = searchGroup && searchGroup === 'No group' ? '{}' : searchGroup;
+  const withoutGroups = query.withoutGroups;
+
+  return resolve(model(fromDate, toDate, searchGroup, searchGroupValue, withoutGroups));
 });
 
 module.exports = {
