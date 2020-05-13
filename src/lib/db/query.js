@@ -7,6 +7,8 @@ const totalCount = 'SELECT count(*)::INTEGER FROM lev_audit';
 const fromDate = 'date_time >= $(from)';
 const toDate = 'date_time < $(to)';
 const searchGroup = 'groups::TEXT ILIKE \'%\' || $(group) || \'%\'';
+const searchWithoutGroup = 'groups::TEXT NOT ILIKE \'%\' || $(withoutGroups) || \'%\'';
+const searchWithoutGroups = 'NOT (groups && $(withoutGroups))';
 
 const filterObject = (obj) => Object.fromEntries(Object.entries(obj).filter(e => e[1]));
 
@@ -18,15 +20,16 @@ const sqlBuilder = (obj, joiner) => {
 };
 
 module.exports = {
-  usageByDateType: (from, to, group) => db.manyOrNone(
+  usageByDateType: (from, to, group, withoutGroups) => db.manyOrNone(
     sqlBuilder({
       'SELECT': 'date_time::DATE AS date, dataset, count(*)::INTEGER',
       'FROM': 'lev_audit',
-      'WHERE': [from && fromDate, to && toDate, group && searchGroup],
+      'WHERE': [from && fromDate, to && toDate, group && searchGroup,
+        withoutGroups && (Array.isArray(withoutGroups) && searchWithoutGroups || searchWithoutGroup)],
       'GROUP BY': 'date, dataset',
       'ORDER BY': 'date'
     }, '\n'),
-    filterObject({ from: from, to: to, group: group }))
+    filterObject({ from, to, group, withoutGroups }))
     .catch(e => {
       global.logger.error(`Problem retrieving counts for datatypes by day between: 
       ${from} and ${to || 'now'} 'for' ${group || 'all groups'}`, e);
@@ -85,24 +88,25 @@ module.exports = {
     }),
 
   searchTotals: (isAllTimeCount) =>
-      db.one(
-        `${isAllTimeCount ? totalCount : `${totalCount} WHERE ${fromDate}`}`,
-        isAllTimeCount ? [] : { from: moment.tz('Europe/London').startOf('day').format() },
-        data => data.count)
+    db.one(
+      `${isAllTimeCount ? totalCount : `${totalCount} WHERE ${fromDate}`}`,
+      isAllTimeCount ? [] : { from: moment.tz('Europe/London').startOf('day').format() },
+      data => data.count)
       .catch(e => {
         global.logger.error(`Problem retrieving ${isAllTimeCount ? 'an all time count' : 'a count for today'}`, e);
         throw new Error('Could not fetch data');
-      }),
+    }),
 
-  searchTimePeriodByGroup: (from, to, group) => db.one(
-      sqlBuilder({
-        'SELECT': 'count(*)::INTEGER',
-        'FROM': 'lev_audit',
-        'WHERE': [from && fromDate, to && toDate, group && searchGroup]
-      }, '\n'),
-      filterObject({ from, to, group }),
-      data => data.count
-    )
+  searchWithGroupFiltering: (from, to, group, withoutGroups) => db.one(
+    sqlBuilder({
+      'SELECT': 'count(*)::INTEGER',
+      'FROM': 'lev_audit',
+      'WHERE': [from && fromDate, to && toDate, group && searchGroup,
+        withoutGroups && (Array.isArray(withoutGroups) && searchWithoutGroups || searchWithoutGroup)]
+    }, '\n'),
+    filterObject({ from, to, group, withoutGroups }),
+    data => data.count
+  )
     .catch(e => {
       global.logger.error(`Problem retrieving a search from "${from}" to "${to || 'now'}" for group "${group}"`, e);
       throw new Error('Could not fetch data');

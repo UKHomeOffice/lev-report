@@ -3,7 +3,7 @@
 const { promiseResponder, dashboard, home, homeError } = require('./route-helpers');
 const { LevDashboard, LevReport } = require('lev-react-components');
 
-module.exports = server => {
+const routes = server => {
   server.get('/readiness', (req, res) => res.send('OK'));
 
   server.get('/data', promiseResponder(homeError(server.errors.BadRequestError)));
@@ -14,3 +14,5 @@ module.exports = server => {
 
   server.get('/*', promiseResponder(home, LevReport));
 };
+
+module.exports = routes;

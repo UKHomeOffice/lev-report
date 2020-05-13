@@ -1,4 +1,3 @@
-
 module.exports = {
   usageByDateType: {
     fromDateOnlySQL: `SELECT date_time::DATE AS date, dataset, count(*)::INTEGER
@@ -73,13 +72,28 @@ ORDER BY date`
     todayCountSQL: `SELECT count(*)::INTEGER FROM lev_audit WHERE date_time >= $(from)`
   },
 
-  searchTimePeriodByGroup: {
+  searchWithGroupFiltering: {
     fromToGroupSQL: `SELECT count(*)::INTEGER
 FROM lev_audit
 WHERE date_time >= $(from) AND date_time < $(to) AND groups::TEXT ILIKE '%' || $(group) || '%'`,
-    gorupOnlySQL: `SELECT count(*)::INTEGER
+    multipleWithoutGroupsOnlySQL: `SELECT count(*)::INTEGER
 FROM lev_audit
-WHERE groups::TEXT ILIKE '%' || $(group) || '%'`
+WHERE date_time >= $(from) AND NOT (groups && $(withoutGroups))`,
+    singleWithoutGroupsOnlySQL: `SELECT count(*)::INTEGER
+FROM lev_audit
+WHERE date_time >= $(from) AND groups::TEXT NOT ILIKE \'%\' || $(withoutGroups) || \'%\'`,
+    groupOnlySQL: `SELECT count(*)::INTEGER
+FROM lev_audit
+WHERE date_time >= $(from) AND groups::TEXT ILIKE '%' || $(group) || '%'`,
+    fromToGroupMultipleWithoutGroupsSQL: `SELECT count(*)::INTEGER
+FROM lev_audit
+WHERE date_time >= $(from) AND date_time < $(to) AND groups::TEXT ILIKE \'%\' || $(group) || \'%\' AND NOT (groups && $(withoutGroups))`,
+    fromToMultipleWithoutGroupsSQL: `SELECT count(*)::INTEGER
+FROM lev_audit 
+WHERE date_time >= $(from) AND date_time < $(to) NOT (groups && $(withoutGroups))`,
+    fromToSingleWithoutGroupsSQL: `SELECT count(*)::INTEGER
+FROM lev_audit
+WHERE date_time >= $(from) AND date_time < $(to) AND groups::TEXT NOT ILIKE \'%\' || $(withoutGroups) || \'%\'`
   },
   hourlyUsage: {
     // NOTE: the following query would take around 30 SECONDS to complete, so will 502

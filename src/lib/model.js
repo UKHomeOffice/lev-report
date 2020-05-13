@@ -24,10 +24,10 @@ const insertData = (model, data) => data.forEach(
 );
 
 const datatypes = ['birth', 'death', 'marriage', 'partnership'];
-const dailyUsage = (dateFrom, dateTo, searchGroup) => {
+const dailyUsage = (dateFrom, dateTo, searchGroup, searchWithoutGroups) => {
   const usage = datatypes.reduce((u, dt) => objPush(u, dt, []), { });
 
-  return query.usageByDateType(dateFrom, dateTo, searchGroup).then(data => {
+  return query.usageByDateType(dateFrom, dateTo, searchGroup, searchWithoutGroups).then(data => {
     insertData(usage, data);
     return Object.entries(usage).reduce((u, e) => [...u, { name: e[0], dailyUsage: e[1] }], []);
   });
@@ -54,7 +54,6 @@ const processGroups = data => data.reduce(
       : [...groups, group(d, len && findParent(d, groups))]
   , []);
 const groupUsage = (dateFrom, dateTo) => query.usageByGroup(dateFrom, dateTo).then(processGroups);
-
 const hours = (name, colour) => ({
   name,
   data: Array.from({ length: 24 }, (_, n) => ({ count: 0, hour: n })),
@@ -89,11 +88,11 @@ const processHourlyUsage = (nod, data) => {
 const hourlyUsage = (dateFrom, dateTo, searchGroup) => query.hourlyUsage(dateFrom, dateTo, searchGroup)
   .then(processHourlyUsage.bind(null, dayCounts(dateFrom, dateTo || moment().endOf('day'))));
 
-const build = (dateFrom, dateTo, searchGroup, groupSearchText) => Promise.join(
-  dailyUsage(dateFrom, dateTo, searchGroup),
+const build = (dateFrom, dateTo, searchGroup, groupSearchText, searchWithoutGroups) => Promise.join(
+  dailyUsage(dateFrom, dateTo, searchGroup, searchWithoutGroups),
   datasetUsage(dateFrom, dateTo),
   groupUsage(dateFrom, dateTo),
-  query.searchTimePeriodByGroup(dateFrom, dateTo, searchGroup),
+  query.searchWithGroupFiltering(dateFrom, dateTo, searchGroup, searchWithoutGroups),
   hourlyUsage(dateFrom, dateTo, searchGroup),
   (daily, totals, groups, total, hourly) => ({
     from: dateFrom,
@@ -104,7 +103,8 @@ const build = (dateFrom, dateTo, searchGroup, groupSearchText) => Promise.join(
     totals,
     currentGroup: groupSearchText,
     total,
-    hourlyUsage: hourly
+    hourlyUsage: hourly,
+    withoutGroups: searchWithoutGroups
   })
 );
 
