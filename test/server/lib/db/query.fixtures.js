@@ -1,3 +1,4 @@
+
 module.exports = {
   usageByDateType: {
     fromDateOnlySQL: `SELECT date_time::DATE AS date, dataset, count(*)::INTEGER
@@ -95,6 +96,7 @@ WHERE date_time >= $(from) AND date_time < $(to) NOT (groups && $(withoutGroups)
 FROM lev_audit
 WHERE date_time >= $(from) AND date_time < $(to) AND groups::TEXT NOT ILIKE \'%\' || $(withoutGroups) || \'%\'`
   },
+
   hourlyUsage: {
     // NOTE: the following query would take around 30 SECONDS to complete, so will 502
     // It may be possible to re-include this kind full data request once the the
