@@ -127,5 +127,12 @@ FROM (
   WHERE date_time >= $(from) AND date_time < $(to) AND groups::TEXT ILIKE '%' || $(group) || '%'
 ) AS counts
 GROUP BY weekend, hour`
-  }
+  },
+
+  cumulativeUsageSQL: `SELECT DATE_TRUNC('month', date_time) AS month,
+  SUM(COUNT(*)) OVER (ORDER BY DATE_TRUNC('month', date_time))::INTEGER AS count
+FROM lev_audit
+WHERE date_time < DATE_TRUNC('month', NOW())
+GROUP BY 1
+ORDER BY 1`
 };

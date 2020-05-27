@@ -327,7 +327,11 @@ describe('lib/db/query', () => {
       { count: 12, weekend: true, hour: 12 },
       { count: 15, weekend: true, hour: 13 }
     ];
-    stubs.manyOrNone.returns(Promise.resolve(counts));
+		before(() => {
+      stubs.manyOrNone.returns(Promise.resolve(counts));
+      stubs.manyOrNone.resetHistory();
+    });
+
 
     // Calling without a from date is too inefficient, so throw error instead
     it('should throw an error when called without a "from" date', () =>
@@ -363,5 +367,29 @@ describe('lib/db/query', () => {
         );
       });
     });
+  });
+
+  describe('cumulativeUsage', () => {
+    const counts = [
+      { month: '2017-11-01 00:00:00+00', count: 193 },
+      { month: '2017-12-01 00:00:00+00', count: 608 },
+      { month: '2018-01-01 00:00:00+00', count: 1013 },
+      { month: '2018-02-01 00:00:00+00', count: 1260 },
+      { month: '2018-03-01 00:00:00+00', count: 1632 }
+    ];
+    before(() => {
+      stubs.manyOrNone.returns(Promise.resolve(counts));
+      stubs.manyOrNone.resetHistory()
+    });
+
+    it('should return an array of month counts from the DB', () =>
+      expect(fakeQuery.cumulativeUsage())
+        .to.be.an.instanceOf(Promise)
+        .that.eventually.deep.equals(counts)
+    );
+    it('should build an SQL statement', () =>
+      expect(stubs.manyOrNone).to.have.been.calledOnce
+        .and.to.have.been.calledWith(fixtures.cumulativeUsageSQL, [])
+    );
   });
 });
