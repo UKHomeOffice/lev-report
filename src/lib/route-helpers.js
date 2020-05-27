@@ -4,6 +4,7 @@ const dateFormat = 'YYYY-MM-DD';
 const moment = require('moment-timezone');
 const model = require('./model');
 const dashboardModel = require('./dashboard-model');
+const history = require('./history-model').history;
 
 const promiseResponder = (promise, Component) => (req, res, next) => promise(req.query)
   .then(data => Component ? res.render(Component, data) : res.send(data))
@@ -37,6 +38,7 @@ module.exports = {
   dateChecker,
   promiseResponder,
   dashboard: dashboardModel,
+  history,
   home: home(),
   homeError: RequestError => home(dateError(RequestError))
 };
