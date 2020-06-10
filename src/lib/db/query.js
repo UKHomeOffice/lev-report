@@ -134,5 +134,26 @@ module.exports = {
           `Problem retrieving hour counts between: ${from} and ${to || 'now'} for group "${group}"`, e);
         throw new Error('Could not fetch data');
       });
-  }
+  },
+
+  cumulativeUsage: () => db.manyOrNone(
+      sqlBuilder({
+        'SELECT': 'month, SUM(count) OVER (ORDER BY month)',
+        'FROM': '(',
+        '  SELECT': 'COUNT(c.*) AS count, months.month AS month',
+        '  FROM': 'lev_audit AS c',
+        '  JOIN': '(',
+        '    SELECT': 'GENERATE_SERIES(DATE_TRUNC(\'month\', MIN(date_time)), ' +
+                      'DATE_TRUNC(\'month\', NOW()), \'1 month\'::INTERVAL) AS month',
+        '    FROM': 'lev_audit',
+        '  )': 'AS months',
+        '  ON': 'c.date_time < months.month AND c.date_time >= (months.month - \'1 month\'::INTERVAL)',
+        '  GROUP BY': '2',
+        ')': 'AS counts'
+      }, '\n'), []
+    )
+    .catch(e => {
+      global.logger.error('Problem retrieving cumulative usage data', e);
+      throw new Error('Could not fetch data');
+    })
 };
