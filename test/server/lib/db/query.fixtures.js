@@ -129,10 +129,15 @@ FROM (
 GROUP BY weekend, hour`
   },
 
-  cumulativeUsageSQL: `SELECT DATE_TRUNC('month', date_time) AS month,
-  SUM(COUNT(*)) OVER (ORDER BY DATE_TRUNC('month', date_time))::INTEGER AS count
-FROM lev_audit
-WHERE date_time < DATE_TRUNC('month', NOW())
-GROUP BY 1
-ORDER BY 1`
+  cumulativeUsageSQL: `SELECT month, SUM(count) OVER (ORDER BY month)
+FROM (
+  SELECT COUNT(c.*) AS count, months.month AS month
+  FROM lev_audit AS c
+  JOIN (
+    SELECT GENERATE_SERIES(DATE_TRUNC('month', MIN(date_time)), DATE_TRUNC('month', NOW()), '1 month'::INTERVAL) AS month
+    FROM lev_audit
+  ) AS months
+  ON c.date_time < months.month AND c.date_time >= (months.month - '1 month'::INTERVAL)
+  GROUP BY 2
+) AS counts`
 };
