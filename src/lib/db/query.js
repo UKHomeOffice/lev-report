@@ -138,7 +138,7 @@ module.exports = {
 
   cumulativeUsage: () => db.manyOrNone(
       sqlBuilder({
-        'SELECT': 'month, SUM(count) OVER (ORDER BY month)',
+        'SELECT': 'month, (SUM(count) OVER (ORDER BY month))::INTEGER AS count',
         'FROM': '(',
         '  SELECT': 'COUNT(c.*) AS count, months.month AS month',
         '  FROM': 'lev_audit AS c',

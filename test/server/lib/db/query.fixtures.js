@@ -129,7 +129,7 @@ FROM (
 GROUP BY weekend, hour`
   },
 
-  cumulativeUsageSQL: `SELECT month, SUM(count) OVER (ORDER BY month)
+  cumulativeUsageSQL: `SELECT month, (SUM(count) OVER (ORDER BY month))::INTEGER AS count
 FROM (
   SELECT COUNT(c.*) AS count, months.month AS month
   FROM lev_audit AS c
