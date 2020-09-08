@@ -1,6 +1,6 @@
 {
   "name": "lev-report",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Reports showing usage of LEV.",
   "main": "src/server.js",
   "scripts": {
@@ -29,7 +29,7 @@
     "@babel/runtime": "^7.6.3",
     "bluebird": "^3.5.4",
     "browserify": "^16.2.3",
-    "lev-react-components": "^0.10.0",
+    "lev-react-components": "^0.11.0",
     "lev-react-renderer": "^0.1.0",
     "lev-restify": "^1.0.0",
     "moment": "^2.24.0",
