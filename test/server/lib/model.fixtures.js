@@ -41,7 +41,8 @@ module.exports = {
           { hour: 16, count: 1447/5.0 }, { hour: 17, count: 612/5.0 }, { hour: 18, count: 217/5.0 },
           { hour: 19, count: 155/5.0 }, { hour: 20, count: 28/5.0 }, { hour: 21, count: 11/5.0 },
           { hour: 22, count: 0 }, { hour: 23, count: 0 }
-        ]
+        ],
+        colour: '#2746B9'
       },
       { name: 'weekend', data: [
           { hour: 0, count: 0 }, { hour: 1, count: 0 }, { hour: 2, count: 0 }, { hour: 3, count: 0 },
@@ -51,7 +52,8 @@ module.exports = {
           { hour: 13, count: 189/2.0 }, { hour: 14, count: 151/2.0 }, { hour: 15, count: 117/2.0 },
           { hour: 16, count: 0 }, { hour: 17, count: 0 }, { hour: 18, count: 0 }, { hour: 19, count: 0 },
           { hour: 20, count: 0 }, { hour: 21, count: 0 }, { hour: 22, count: 0 }, { hour: 23, count: 0 }
-        ]
+        ],
+        colour: '#31BB76'
       },
       { name: 'average', data: [
           { hour: 0, count: 0 }, { hour: 1, count: 0 }, { hour: 2, count: 0 }, { hour: 3, count: 0 },
@@ -62,7 +64,8 @@ module.exports = {
           { hour: 16, count: 1447/7.0 }, { hour: 17, count: 612/7.0 }, { hour: 18, count: 217/7.0 },
           { hour: 19, count: 155/7.0 }, { hour: 20, count: 28/7.0 }, { hour: 21, count: 11/7.0 },
           { hour: 22, count: 0 }, { hour: 23, count: 0 }
-        ]
+        ],
+        colour: '#0B69D4'
       }
     ]
   }

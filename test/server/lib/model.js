@@ -146,6 +146,9 @@ describe('lib/model', () => {
         expect(result).to.have.nested.property('[0].name', results.hourlyUsage[0].name);
         expect(result).to.have.nested.property('[1].name', results.hourlyUsage[1].name);
         expect(result).to.have.nested.property('[2].name', results.hourlyUsage[2].name);
+        expect(result).to.have.nested.property('[0].colour', results.hourlyUsage[0].colour);
+        expect(result).to.have.nested.property('[1].colour', results.hourlyUsage[1].colour);
+        expect(result).to.have.nested.property('[2].colour', results.hourlyUsage[2].colour);
         expect(result).to.have.nested.property('[0].data').that.deep.equals(results.hourlyUsage[0].data);
         expect(result).to.have.nested.property('[1].data').that.deep.equals(results.hourlyUsage[1].data);
         expect(result).to.have.nested.property('[2].data').that.deep.equals(results.hourlyUsage[2].data);
