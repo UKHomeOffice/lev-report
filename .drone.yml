@@ -8,6 +8,13 @@ platform:
   arch: amd64
 
 steps:
+  - name: build-image
+    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
+    commands:
+      # wait for docker service to be up before running docker build
+      - n=0; while [ "$n" -lt 60 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
+      - docker build -t test .
+
 - name: test_pr
   pull: if-not-exists
   image: quay.io/ukhomeofficedigital/lev-ci
@@ -115,5 +122,5 @@ steps:
 
 services:
   - name: docker
-    image: quay.io/ukhomeofficedigital/lev-ci
+    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
 ...
