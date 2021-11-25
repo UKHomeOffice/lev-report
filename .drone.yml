@@ -13,8 +13,6 @@ steps:
   image: quay.io/ukhomeofficedigital/lev-ci
   commands:
   - make test
-  environment:
-    DOCKER_HOST: tcp://172.17.0.1:2375
   when:
     event:
     - pull_request
@@ -26,8 +24,6 @@ steps:
   - set -o pipefail
   - make test | tee 'test.log'
   - set-tags
-  environment:
-    DOCKER_HOST: tcp://172.17.0.1:2375
   when:
     branch:
     - master
