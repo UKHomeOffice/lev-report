@@ -1,93 +1,120 @@
-matrix:
-  NAME:
-    - ukhomeofficedigital/lev-report
-  DOCKER_USERNAME:
-    - ukhomeofficedigital+lev_report
-  DOCKER_REPO:
-    - quay.io
+---
+kind: pipeline
+name: matrix-1
+type: kubernetes
 
-pipeline:
-  test_pr:
-    image: quay.io/ukhomeofficedigital/lev-ci
-    environment:
-      - DOCKER_HOST=tcp://172.17.0.1:2375
-    commands:
-      - make test
-    when:
-      event: pull_request
-  test_push:
-    image: quay.io/ukhomeofficedigital/lev-ci
-    environment:
-      - DOCKER_HOST=tcp://172.17.0.1:2375
-    commands:
-      - set -o pipefail
-      - make test | tee 'test.log'
-      - set-tags
-    when:
-      event: push
-      branch: master
+platform:
+  os: linux
+  arch: amd64
 
-  docker-build-and-push:
-    image: ukhomeoffice/drone-docker
-    secrets: [ docker_password ]
-    username: '${DOCKER_USERNAME}'
-    repo: '${DOCKER_REPO}/${NAME}'
-    registry: '${DOCKER_REPO}'
-    when:
-      event: push
-      branch: master
+steps:
+- name: test_pr
+  pull: if-not-exists
+  image: quay.io/ukhomeofficedigital/lev-ci
+  commands:
+  - make test
+  environment:
+    DOCKER_HOST: tcp://172.17.0.1:2375
+  when:
+    event:
+    - pull_request
 
-  deploy_image:
-    image: quay.io/ukhomeofficedigital/lev-ci
-    secrets:
-      - KUBE_SERVER
-      - KUBE_NAMESPACE
-      - KUBE_TOKEN
-      - KUBE_DEPLOYMENT
-      - KUBE_CONTAINER
-    environment:
-      - DOCKER_REPO=quay.io
-      - DOCKER_BASEDIR=/ukhomeofficedigital/
-      - DOCKER_IMAGE=lev-report
-    commands:
-      - source get-package-details
-      - IMAGE="$${DOCKER_REPO}$${DOCKER_BASEDIR}$${DOCKER_IMAGE}"
-      - kubectl="kubectl --insecure-skip-tls-verify --server=$${KUBE_SERVER} --namespace=$${KUBE_NAMESPACE} --token=$${KUBE_TOKEN}"
-      - $${kubectl} scale deployment $${KUBE_DEPLOYMENT} --replicas 2
-      - $${kubectl} set image deployment/$${KUBE_DEPLOYMENT} "$${KUBE_CONTAINER}=$${IMAGE}:$${FULL_VERSION}"
-      - $${kubectl} rollout status deployment/$${KUBE_DEPLOYMENT}
-      - $${kubectl} scale deployment $${KUBE_DEPLOYMENT} --replicas 1
-    when:
-      branch: master
-      event: push
+- name: test_push
+  pull: if-not-exists
+  image: quay.io/ukhomeofficedigital/lev-ci
+  commands:
+  - set -o pipefail
+  - make test | tee 'test.log'
+  - set-tags
+  environment:
+    DOCKER_HOST: tcp://172.17.0.1:2375
+  when:
+    branch:
+    - master
+    event:
+    - push
 
-  notify_slack_success:
-    image: plugins/slack:1.0
-    secrets: [ slack_webhook ]
+- name: docker-build-and-push
+  pull: if-not-exists
+  image: ukhomeoffice/drone-docker
+  settings:
+    registry: quay.io
+    repo: quay.io/ukhomeofficedigital/lev-report
+    username: ukhomeofficedigital+lev_report
+  environment:
+    DOCKER_PASSWORD:
+      from_secret: docker_password
+  when:
+    branch:
+    - master
+    event:
+    - push
+
+- name: deploy_image
+  pull: if-not-exists
+  image: quay.io/ukhomeofficedigital/lev-ci
+  commands:
+  - source get-package-details
+  - IMAGE="$quay.io$${DOCKER_BASEDIR}$${DOCKER_IMAGE}"
+  - kubectl="kubectl --insecure-skip-tls-verify --server=$${KUBE_SERVER} --namespace=$${KUBE_NAMESPACE} --token=$${KUBE_TOKEN}"
+  - $${kubectl} scale deployment $${KUBE_DEPLOYMENT} --replicas 2
+  - $${kubectl} set image deployment/$${KUBE_DEPLOYMENT} "$${KUBE_CONTAINER}=$${IMAGE}:$${FULL_VERSION}"
+  - $${kubectl} rollout status deployment/$${KUBE_DEPLOYMENT}
+  - $${kubectl} scale deployment $${KUBE_DEPLOYMENT} --replicas 1
+  environment:
+    DOCKER_BASEDIR: /ukhomeofficedigital/
+    DOCKER_IMAGE: lev-report
+    DOCKER_REPO: quay.io
+    KUBE_CONTAINER:
+      from_secret: KUBE_CONTAINER
+    KUBE_DEPLOYMENT:
+      from_secret: KUBE_DEPLOYMENT
+    KUBE_NAMESPACE:
+      from_secret: KUBE_NAMESPACE
+    KUBE_SERVER:
+      from_secret: KUBE_SERVER
+    KUBE_TOKEN:
+      from_secret: KUBE_TOKEN
+  when:
+    branch:
+    - master
+    event:
+    - push
+
+- name: notify_slack_success
+  pull: if-not-exists
+  image: plugins/slack:1.0
+  settings:
     channel: general
+    template: "*Deployed {{repo.name}} to Dev* - <{{build.link}}|#{{build.number}}>\n"
     username: Drone
-    template: >
-      *Deployed {{repo.name}} to Dev* - <{{build.link}}|#{{build.number}}>
-    when:
-      branch: master
-      event: push
-      status: success
+  environment:
+    SLACK_WEBHOOK:
+      from_secret: slack_webhook
+  when:
+    branch:
+    - master
+    event:
+    - push
+    status:
+    - success
 
-  notify_slack_failure:
-    image: plugins/slack
-    secrets: [ slack_webhook ]
+- name: notify_slack_failure
+  pull: if-not-exists
+  image: plugins/slack
+  settings:
     channel: alerts
+    template: "*Failed to deploy {{repo.name}} to Dev*\nAuthor: {{build.author}}\nDuration: {{since job.started}} Job: <{{build.link}}|#{{build.number}}>\nCommit: {{build.commit}}\n"
     username: Drone
-    template: >
-      *Failed to deploy {{repo.name}} to Dev*
+  environment:
+    SLACK_WEBHOOK:
+      from_secret: slack_webhook
+  when:
+    branch:
+    - master
+    event:
+    - push
+    status:
+    - failure
 
-      Author: {{build.author}}
-
-      Duration: {{since job.started}}
-      Job: <{{build.link}}|#{{build.number}}>
-
-      Commit: {{build.commit}}
-    when:
-      branch: master
-      event: push
-      status: failure
+...
