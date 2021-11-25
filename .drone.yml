@@ -117,4 +117,7 @@ steps:
     status:
     - failure
 
+services:
+  - name: docker
+    image: quay.io/ukhomeofficedigital/lev-ci
 ...
