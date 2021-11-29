@@ -9,7 +9,7 @@ platform:
 
 steps:
 - name: build-image
-  image: docker:dind
+  image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
   environment:
     DOCKER_HOST: tcp://docker:2375
   commands:
@@ -124,5 +124,5 @@ steps:
 
 services:
   - name: docker
-    image: docker:dind
+    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
 ...

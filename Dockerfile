@@ -4,7 +4,8 @@ RUN apk add --no-cache \
       ca-certificates \
       g++ \
       make \
-      python \
+      python3 \
+ && apk update \
  && apk upgrade --no-cache \
  && addgroup -S app \
  && adduser -S app -G app -u 31337 -h /app/ \
