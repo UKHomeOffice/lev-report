@@ -60,7 +60,7 @@ steps:
   image: quay.io/ukhomeofficedigital/lev-ci
   commands:
   - source get-package-details
-  - IMAGE="$quay.io$${DOCKER_BASEDIR}$${DOCKER_IMAGE}"
+  - IMAGE="$${DOCKER_REPO}$${DOCKER_BASEDIR}$${DOCKER_IMAGE}"
   - kubectl="kubectl --insecure-skip-tls-verify --server=$${KUBE_SERVER} --namespace=$${KUBE_NAMESPACE} --token=$${KUBE_TOKEN}"
   - $${kubectl} scale deployment $${KUBE_DEPLOYMENT} --replicas 2
   - $${kubectl} set image deployment/$${KUBE_DEPLOYMENT} "$${KUBE_CONTAINER}=$${IMAGE}:$${FULL_VERSION}"
