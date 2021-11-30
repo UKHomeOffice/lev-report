@@ -8,6 +8,15 @@ platform:
   arch: amd64
 
 steps:
+- name: build-image
+  pull: if-not-exists
+  image: plugins/docker
+  settings:
+    registry: quay.io
+    repo: quay.io/ukhomeofficedigital/lev-report
+    username: ukhomeofficedigital+lev_report
+    dry_run: true
+
 - name: test_pr
   pull: if-not-exists
   image: quay.io/ukhomeofficedigital/lev-ci
@@ -32,7 +41,7 @@ steps:
 
 - name: docker-build-and-push
   pull: if-not-exists
-  image: ukhomeoffice/drone-docker
+  image: plugins/docker
   settings:
     registry: quay.io
     repo: quay.io/ukhomeofficedigital/lev-report
@@ -112,8 +121,4 @@ steps:
     - push
     status:
     - failure
-
-services:
-  - name: docker
-    image: quay.io/ukhomeofficedigital/lev-ci
 ...
