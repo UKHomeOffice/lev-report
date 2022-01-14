@@ -23,6 +23,7 @@ RUN npm install --only production > .npm-install.log 2>&1 \
 COPY --chown=app:app assets/ /app/assets/
 COPY --chown=app:app pages/ /app/pages/
 COPY --chown=app:app src/ /app/src/
+COPY --chown=app:app rds-combined-ca-bundle.pem /app/
 
 RUN npm run postinstall
 
@@ -40,4 +41,5 @@ ENV LISTEN_HOST="0.0.0.0" \
     POSTGRES_DB="lev" \
     POSTGRES_USER="lev" \
     POSTGRES_PASSWORD="lev"
+    NODE_EXTRA_CA_CERTS="/app/rds-combined-ca-bundle.pem"
 CMD ["node", "."]
