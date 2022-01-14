@@ -40,6 +40,6 @@ ENV LISTEN_HOST="0.0.0.0" \
     POSTGRES_PORT="5432" \
     POSTGRES_DB="lev" \
     POSTGRES_USER="lev" \
-    POSTGRES_PASSWORD="lev"
+    POSTGRES_PASSWORD="lev" \
     NODE_EXTRA_CA_CERTS="/app/rds-combined-ca-bundle.pem"
 CMD ["node", "."]
