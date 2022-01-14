@@ -15,14 +15,14 @@ USER app
 WORKDIR /app
 ENV NODE_ENV production
 
-COPY *node_modules/ package.json package-lock.json /app/
+COPY --chown=app:app *node_modules/ package.json package-lock.json /app/
 RUN npm install --only production > .npm-install.log 2>&1 \
  && rm .npm-install.log \
  || ( EC=$?; cat .npm-install.log; exit $EC )
 
-COPY --chown=app assets/ /app/assets/
-COPY --chown=app pages/ /app/pages/
-COPY --chown=app src/ /app/src/
+COPY --chown=app:app assets/ /app/assets/
+COPY --chown=app:app pages/ /app/pages/
+COPY --chown=app:app src/ /app/src/
 
 RUN npm run postinstall
 
