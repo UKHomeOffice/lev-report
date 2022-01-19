@@ -7,10 +7,6 @@ platform:
   os: linux
   arch: amd64
 
-trigger:
-  branch:
-    master
-
 steps:
 - name: build-image
   pull: if-not-exists
@@ -38,6 +34,8 @@ steps:
   - make test | tee 'test.log'
   - set-tags
   when:
+    branch:
+    - master
     event:
     - push
 
@@ -52,6 +50,8 @@ steps:
     DOCKER_PASSWORD:
       from_secret: docker_password
   when:
+    branch:
+    - master
     event:
     - push
 
@@ -77,6 +77,8 @@ steps:
     KUBE_TOKEN:
       from_secret: KUBE_TOKEN
   when:
+    branch:
+    - master
     event:
     - push
 
@@ -91,6 +93,8 @@ steps:
     SLACK_WEBHOOK:
       from_secret: slack_webhook
   when:
+    branch:
+    - master
     event:
     - push
     status:
@@ -107,6 +111,8 @@ steps:
     SLACK_WEBHOOK:
       from_secret: slack_webhook
   when:
+    branch:
+    - master
     event:
     - push
     status:
