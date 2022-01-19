@@ -13,7 +13,8 @@
     "watch:ui": "nodemon -w src -w test -x 'npm run test:ui'",
     "copy:images": "cp -r ./assets/images ./public/",
     "browserify": "browserify ./assets/js/app.js > ./public/js/bundle.js",
-    "postinstall": "if [ -e ./assets ]; then mkdir -p public/js public/css && npm run copy:images && npm run browserify ; fi"
+    "postinstall": "if [ -e ./assets ]; then mkdir -p public/js public/css && npm run copy:images && npm run browserify ; fi",
+    "snyk:test": "snyk test"
   },
   "repository": {
     "type": "git",
@@ -60,6 +61,7 @@
     "rewire": "^5.0.0",
     "sinon": "^7.3.2",
     "sinon-chai": "^3.3.0",
+    "snyk": "^1.833.0",
     "timeshift": "0.0.2"
   }
 }
