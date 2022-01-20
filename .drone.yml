@@ -21,10 +21,20 @@ steps:
   pull: if-not-exists
   image: quay.io/ukhomeofficedigital/lev-ci:3.5.2
   commands:
-  - make test
+  - npm install
+  - npm test
   when:
     event:
     - pull_request
+
+#- name: test_pr
+#  pull: if-not-exists
+#  image: quay.io/ukhomeofficedigital/lev-ci:3.5.2
+#  commands:
+#  - make test
+#  when:
+#    event:
+#    - pull_request
 
 - name: test_push
   pull: if-not-exists
