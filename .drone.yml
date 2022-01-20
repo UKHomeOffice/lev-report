@@ -21,8 +21,9 @@ steps:
   pull: if-not-exists
   image: quay.io/ukhomeofficedigital/lev-ci
   commands:
-  - set -o pipefail
-  - make test
+    - echo 'Hello'
+    - make -v
+    - echo 'Goodbye'
   when:
     event:
     - pull_request
