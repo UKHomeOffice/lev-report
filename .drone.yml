@@ -17,24 +17,24 @@ steps:
     username: ukhomeofficedigital+lev_report
     dry_run: true
 
-- name: test_pr
-  pull: if-not-exists
-  image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
-  commands:
-  - npm install
-  - npm test
-  when:
-    event:
-    - pull_request
-
 #- name: test_pr
 #  pull: if-not-exists
-#  image: quay.io/ukhomeofficedigital/lev-ci
+#  image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
 #  commands:
-#  - make test
+#  - npm install
+#  - npm test
 #  when:
 #    event:
 #    - pull_request
+
+- name: test_pr
+  pull: if-not-exists
+  image: quay.io/ukhomeofficedigital/lev-ci
+  commands:
+  - make test
+  when:
+    event:
+    - pull_request
 
 - name: test_push
   pull: if-not-exists
