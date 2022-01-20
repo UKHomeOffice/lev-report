@@ -22,7 +22,7 @@ steps:
   image: quay.io/ukhomeofficedigital/lev-ci
   commands:
     - echo 'Hello'
-    - make -v
+    - make docker-version
     - echo 'Goodbye'
   when:
     event:
