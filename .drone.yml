@@ -7,11 +7,6 @@ platform:
   os: linux
   arch: amd64
 
-resources:
-  requests:
-    cpu: 1000
-    memory: 2GiB
-
 steps:
 - name: build-image
   pull: if-not-exists
@@ -26,18 +21,10 @@ steps:
   pull: if-not-exists
   image: quay.io/ukhomeofficedigital/lev-ci
   commands:
-    - echo 'Hello'
     - make test
-    - echo 'Goodbye'
   when:
     event:
     - pull_request
-  environment:
-    DOCKER_HOST: tcp://127.0.0.1:2375
-  resources:
-    limits:
-      cpu: 1000
-      memory: 2GiB
 
 - name: test_push
   pull: if-not-exists
@@ -130,8 +117,4 @@ steps:
     - push
     status:
     - failure
-
-services:
-  - name: docker
-    image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
 ...
