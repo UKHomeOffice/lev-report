@@ -23,16 +23,16 @@ steps:
 
 - name: test_pr
   pull: if-not-exists
-  image: quay.io/ukhomeofficedigital/lev-ci
+  image: quay.io/ukhomeofficedigital/lev-ci:latest
   commands:
-  - make test
+    - make test
   when:
     event:
     - pull_request
 
 - name: test_push
   pull: if-not-exists
-  image: quay.io/ukhomeofficedigital/lev-ci
+  image: quay.io/ukhomeofficedigital/lev-ci:latest
   commands:
   - set -o pipefail
   - make test | tee 'test.log'
@@ -57,7 +57,7 @@ steps:
 
 - name: deploy_image
   pull: if-not-exists
-  image: quay.io/ukhomeofficedigital/lev-ci
+  image: quay.io/ukhomeofficedigital/lev-ci:latest
   commands:
   - source get-package-details
   - kubectl="kubectl --insecure-skip-tls-verify --server=$${KUBE_SERVER} --namespace=$${KUBE_NAMESPACE} --token=$${KUBE_TOKEN}"
