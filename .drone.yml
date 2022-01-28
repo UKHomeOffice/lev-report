@@ -19,9 +19,9 @@ steps:
 
 - name: test_pr
   pull: if-not-exists
-  image: quay.io/ukhomeofficedigital/lev-ci
+  image: quay.io/ukhomeofficedigital/lev-ci:12-non-alpine
   commands:
-  - make -f Makefile-report test
+  - make test
   when:
     event:
     - pull_request
@@ -31,7 +31,7 @@ steps:
   image: quay.io/ukhomeofficedigital/lev-ci
   commands:
   - set -o pipefail
-  - make -f Makefile-report test | tee 'test.log'
+  - make test | tee 'test.log'
   - set-tags
   when:
     branch:
