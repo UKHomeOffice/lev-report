@@ -21,7 +21,9 @@ steps:
   pull: if-not-exists
   image: quay.io/ukhomeofficedigital/lev-ci
   commands:
-  - make test
+#  - make test
+  - npm install
+  - npm test
   when:
     event:
     - pull_request
@@ -31,7 +33,9 @@ steps:
   image: quay.io/ukhomeofficedigital/lev-ci
   commands:
   - set -o pipefail
-  - make test | tee 'test.log'
+#  - make test | tee 'test.log'
+  - npm install
+  - npm test
   - set-tags
   when:
     branch:
