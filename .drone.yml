@@ -19,7 +19,7 @@ steps:
 
 - name: test_pr
   pull: if-not-exists
-  image: quay.io/ukhomeofficedigital/lev-ci:12-non-alpine
+  image: quay.io/ukhomeofficedigital/lev-ci:3.5.2
   commands:
   - make test
   when:
