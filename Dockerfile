@@ -1,15 +1,13 @@
-FROM node:12-alpine
+FROM ubuntu:18.04
 
-RUN apk add --no-cache \
-      ca-certificates \
-      g++ \
-      make \
-      python3 \
- && apk update \
- && apk upgrade --no-cache \
- && addgroup -S app \
- && adduser -S app -G app -u 31337 -h /app/ \
- && chown -R app:app /app/
+RUN apt-get update -y
+RUN apt-get upgrade -y
+
+RUN apt-get install -y \
+		ca-certificates \
+		g++ \
+		make \
+		python3
 
 USER app
 WORKDIR /app
@@ -27,11 +25,11 @@ COPY --chown=app:app rds-combined-ca-bundle.pem /app/
 
 RUN npm run postinstall
 
-USER root
-RUN apk del --no-cache \
-      g++ \
-      make \
-      python3
+#USER root
+#RUN apk del --no-cache \
+#      g++ \
+#      make \
+#      python3
 
 USER 31337
 ENV LISTEN_HOST="0.0.0.0" \
