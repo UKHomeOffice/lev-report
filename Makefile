@@ -69,6 +69,3 @@ unit-test: node-deps
 	npm test
 
 test: unit-test
-
-make-test:
-	echo "MAKEFILE TEST"

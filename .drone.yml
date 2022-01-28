@@ -25,10 +25,7 @@ steps:
   pull: if-not-exists
   image: quay.io/ukhomeofficedigital/lev-ci:12-non-alpine
   commands:
-    - echo "this is a test"
-    - make --version
-    - ls
-    - make make-test
+    - make test
   when:
     event:
     - pull_request
