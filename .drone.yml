@@ -22,8 +22,8 @@ steps:
     dry_run: true
 
 - name: test_pr
-  pull: if-not-exists
-  image: quay.io/ukhomeofficedigital/lev-ci:12-non-alpine
+  pull: always
+  image: quay.io/ukhomeofficedigital/lev-ci:latest
   commands:
   - make test
   when:
