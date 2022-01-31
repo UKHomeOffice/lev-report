@@ -23,7 +23,7 @@ steps:
 
 - name: test_pr
   pull: always
-  image: quay.io/ukhomeofficedigital/lev-ci:latest
+  image: quay.io/ukhomeofficedigital/lev-ci:3.5.5-ubuntu-test
   commands:
   - make test
   when:
