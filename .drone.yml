@@ -22,8 +22,8 @@ steps:
     dry_run: true
 
 - name: test_pr
-  pull: always
-  image: quay.io/ukhomeofficedigital/lev-ci:3.5.5-ubuntu-test
+  pull: if-not-exists
+  image: quay.io/ukhomeofficedigital/lev-ci:12-non-alpine
   commands:
   - make test
   when:
@@ -32,7 +32,7 @@ steps:
 
 - name: test_push
   pull: if-not-exists
-  image: quay.io/ukhomeofficedigital/lev-ci:3.5.5-ubuntu-test
+  image: quay.io/ukhomeofficedigital/lev-ci:12-non-alpine
   commands:
   - set -o pipefail
   - make test | tee 'test.log'
@@ -59,7 +59,7 @@ steps:
 
 - name: deploy_image
   pull: if-not-exists
-  image: quay.io/ukhomeofficedigital/lev-ci:3.5.5-ubuntu-test
+  image: quay.io/ukhomeofficedigital/lev-ci:12-non-alpine
   commands:
   - source get-package-details
   - kubectl="kubectl --insecure-skip-tls-verify --server=$${KUBE_SERVER} --namespace=$${KUBE_NAMESPACE} --token=$${KUBE_TOKEN}"
