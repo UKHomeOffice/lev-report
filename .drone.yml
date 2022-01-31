@@ -7,6 +7,10 @@ platform:
   os: linux
   arch: amd64
 
+trigger:
+  branch:
+    master
+
 steps:
 - name: build-image
   pull: if-not-exists
@@ -18,10 +22,10 @@ steps:
     dry_run: true
 
 - name: test_pr
-  pull: if-not-exists
-  image: quay.io/ukhomeofficedigital/lev-ci:3.5.5-ubuntu-test
+  pull: always
+  image: quay.io/ukhomeofficedigital/lev-ci:latest
   commands:
-    - make test
+  - make test
   when:
     event:
     - pull_request
@@ -34,8 +38,6 @@ steps:
   - make test | tee 'test.log'
   - set-tags
   when:
-    branch:
-    - master
     event:
     - push
 
