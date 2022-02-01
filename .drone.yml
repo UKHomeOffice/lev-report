@@ -7,10 +7,6 @@ platform:
   os: linux
   arch: amd64
 
-trigger:
-  branch:
-    master
-
 steps:
 - name: build-image
   pull: if-not-exists
@@ -22,8 +18,8 @@ steps:
     dry_run: true
 
 - name: test_pr
-  pull: always
-  image: quay.io/ukhomeofficedigital/lev-ci:latest
+  pull: if-not-exists
+  image: quay.io/ukhomeofficedigital/lev-ci
   commands:
   - make test
   when:
@@ -32,12 +28,14 @@ steps:
 
 - name: test_push
   pull: if-not-exists
-  image: quay.io/ukhomeofficedigital/lev-ci:latest
+  image: quay.io/ukhomeofficedigital/lev-ci
   commands:
   - set -o pipefail
   - make test | tee 'test.log'
   - set-tags
   when:
+    branch:
+    - master
     event:
     - push
 
@@ -52,12 +50,14 @@ steps:
     DOCKER_PASSWORD:
       from_secret: docker_password
   when:
+    branch:
+    - master
     event:
     - push
 
 - name: deploy_image
   pull: if-not-exists
-  image: quay.io/ukhomeofficedigital/lev-ci:latest
+  image: quay.io/ukhomeofficedigital/lev-ci
   commands:
   - source get-package-details
   - kubectl="kubectl --insecure-skip-tls-verify --server=$${KUBE_SERVER} --namespace=$${KUBE_NAMESPACE} --token=$${KUBE_TOKEN}"
@@ -77,12 +77,14 @@ steps:
     KUBE_TOKEN:
       from_secret: KUBE_TOKEN
   when:
+    branch:
+    - master
     event:
     - push
 
 - name: notify_slack_success
   pull: if-not-exists
-  image: plugins/slack:1.0
+  image: plugins/slack
   settings:
     channel: general
     template: "*Deployed {{repo.name}} to Dev* - <{{build.link}}|#{{build.number}}>\n"
@@ -91,6 +93,8 @@ steps:
     SLACK_WEBHOOK:
       from_secret: slack_webhook
   when:
+    branch:
+    - master
     event:
     - push
     status:
@@ -107,6 +111,8 @@ steps:
     SLACK_WEBHOOK:
       from_secret: slack_webhook
   when:
+    branch:
+    - master
     event:
     - push
     status:
