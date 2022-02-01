@@ -7,10 +7,6 @@ platform:
   os: linux
   arch: amd64
 
-trigger:
-  branch:
-    master
-
 steps:
 - name: build-image
   pull: if-not-exists
