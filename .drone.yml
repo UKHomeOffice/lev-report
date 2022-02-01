@@ -22,7 +22,7 @@ steps:
     dry_run: true
 
 - name: test_pr
-  pull: always
+  pull: if-not-exists
   image: quay.io/ukhomeofficedigital/lev-ci
   commands:
   - make test
@@ -31,7 +31,7 @@ steps:
     - pull_request
 
 - name: test_push
-  pull: always
+  pull: if-not-exists
   image: quay.io/ukhomeofficedigital/lev-ci
   commands:
   - set -o pipefail
@@ -58,7 +58,7 @@ steps:
     - push
 
 - name: deploy_image
-  pull: always
+  pull: if-not-exists
   image: quay.io/ukhomeofficedigital/lev-ci
   commands:
   - source get-package-details
