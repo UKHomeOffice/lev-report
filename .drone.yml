@@ -18,7 +18,7 @@ steps:
     dry_run: true
 
 - name: test_pr
-  pull: if-not-exists
+  pull: always
   image: quay.io/ukhomeofficedigital/lev-ci
   commands:
   - make test
@@ -27,7 +27,7 @@ steps:
     - pull_request
 
 - name: test_push
-  pull: if-not-exists
+  pull: always
   image: quay.io/ukhomeofficedigital/lev-ci
   commands:
   - set -o pipefail
