@@ -30,7 +30,8 @@ steps:
   pull: if-not-exists
   image: quay.io/ukhomeofficedigital/lev-ci
   commands:
-  - set -e
+  - bash
+  - set -o pipefail
   - make test | tee 'test.log'
   - set-tags
   when:
