@@ -21,9 +21,7 @@ steps:
   pull: if-not-exists
   image: quay.io/ukhomeofficedigital/lev-ci
   commands:
-  - bash
-  - set -o pipefail
-  - make test | tee 'test.log'
+  - make test
   when:
     event:
     - pull_request
@@ -32,7 +30,6 @@ steps:
   pull: if-not-exists
   image: quay.io/ukhomeofficedigital/lev-ci
   commands:
-  - bash
   - set -o pipefail
   - make test | tee 'test.log'
   - set-tags
