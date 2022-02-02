@@ -30,7 +30,9 @@ steps:
   pull: if-not-exists
   image: quay.io/ukhomeofficedigital/lev-ci
   commands:
-  - ./test_push.sh
+  - set -o pipefail
+  - make test | tee 'test.log'
+  - set-tags
   when:
     branch:
     - master
