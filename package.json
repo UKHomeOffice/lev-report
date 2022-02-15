@@ -38,9 +38,8 @@
     "pg-promise": "^8.6.4",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "react-is": "^16.8.6",
     "react-router-dom": "^5.0.1",
-    "styled-components": "^5.0.1"
+    "styled-components": "^4.3.2"
   },
   "devDependencies": {
     "@babel/plugin-transform-runtime": "^7.6.2",
