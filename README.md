@@ -8,6 +8,9 @@ npm test
 DB_USER=username DB_PASSWORD=password DB_HOST=hostname DB_PORT=port DB_DB=name npm start
 ```
 
+### Note
+The --legacy-peer-deps parameter is required by Node 16 as it has much stricter peer dependency checking than Node 12.
+
 ## Configuration options
 
 ### DB_USER
