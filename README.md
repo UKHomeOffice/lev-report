@@ -3,7 +3,7 @@ Reports showing usage of LEV.
 
 ## Quick start
 ```
-npm i
+npm install --legacy-peer-deps
 npm test
 DB_USER=username DB_PASSWORD=password DB_HOST=hostname DB_PORT=port DB_DB=name npm start
 ```
