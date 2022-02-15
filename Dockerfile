@@ -42,4 +42,4 @@ ENV LISTEN_HOST="0.0.0.0" \
     POSTGRES_USER="lev" \
     POSTGRES_PASSWORD="lev" \
     NODE_EXTRA_CA_CERTS="/app/rds-combined-ca-bundle.pem"
-CMD ["node", "--trace-deprecation", "."]
+CMD ["node", "."]
