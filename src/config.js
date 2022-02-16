@@ -12,7 +12,7 @@ module.exports = {
     host: process.env.POSTGRES_HOST || 'localhost',
     port: process.env.POSTGRES_PORT || '5432',
     database: process.env.POSTGRES_DB || 'lev',
-    ssl: defaultsFalse(process.env.POSTGRES_SSL)
+    ssl: defaultsFalse(process.env.POSTGRES_SSL) === true ? { rejectUnauthorized: false } : false
   },
   http: {
     host: process.env.LISTEN_HOST || '0.0.0.0',
