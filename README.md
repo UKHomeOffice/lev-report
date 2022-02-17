@@ -19,6 +19,7 @@ POSTGRES_DB=xxx POSTGRES_USER=xxx POSTGRES_PASSWORD=xxx POSTGRES_SSL=true NODE_T
 #### Note
 - Insert appropriate values for the environment variables.
 - Start the postgres proxy for the environment
+- Set NODE_TLS_REJECT_UNAUTHORIZED=0 to allow self signed certificates during local testing
 
 ### Test against a locally running database
 ```
