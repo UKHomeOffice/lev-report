@@ -1,6 +1,7 @@
 'use strict';
 
 const defaultsFalse = v => String(v || '').match(/(true|yes|on)/i) !== null;
+const defaultsTrue = v => String(v || '').match(/(false|no|off)/i) === null;
 
 /* eslint-disable no-process-env */
 module.exports = {
@@ -12,7 +13,7 @@ module.exports = {
     host: process.env.POSTGRES_HOST || 'localhost',
     port: process.env.POSTGRES_PORT || '5432',
     database: process.env.POSTGRES_DB || 'lev',
-    ssl: defaultsFalse(process.env.POSTGRES_SSL)
+    ssl: defaultsTrue(process.env.POSTGRES_SSL)
   },
   http: {
     host: process.env.LISTEN_HOST || '0.0.0.0',

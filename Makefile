@@ -32,7 +32,7 @@ deps: node-deps
 node-deps: node_modules/
 
 node_modules/: package.json
-	npm install
+	npm install --legacy-peer-deps
 
 local-components: node-deps
 	cd $(shell dirname $(current_dir))
