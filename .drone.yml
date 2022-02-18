@@ -45,6 +45,11 @@ steps:
   settings:
     registry: quay.io
     repo: quay.io/ukhomeofficedigital/lev-report
+    tags:
+    - "0.9.0-${DRONE_BUILD_NUMBER}-${DRONE_COMMIT:0:10}"
+    - "0.9.0"
+    - "0.9"
+    - "latest"
     username: ukhomeofficedigital+lev_report
   environment:
     DOCKER_PASSWORD:
