@@ -28,7 +28,7 @@
   },
   "homepage": "https://github.com/UKHomeOffice/lev-report#readme",
   "dependencies": {
-    "@babel/runtime": "^7.6.3",
+    "@babel/runtime": "^7.17.7",
     "@snyk/protect": "^1.851.0",
     "bluebird": "^3.5.4",
     "browserify": "^17.0.0",
