@@ -56,7 +56,7 @@
     "eslint-plugin-one-variable-per-var": "0.0.3",
     "jsdom": "^15.0.0",
     "jsdom-global": "^3.0.2",
-    "mocha": "^9.2.0",
+    "mocha": "^9.2.2",
     "mock-require": "^3.0.3",
     "nodemon": "^2.0.15",
     "npm-run-all": "^4.1.5",
